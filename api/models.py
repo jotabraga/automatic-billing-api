@@ -8,8 +8,9 @@ class FileUploaded(models.Model):
         ("fail", "Falha"),
     ]
 
-    name = models.TextField(max_length=8, null=False, blank=False)
-
+    name = models.TextField(null=False, blank=False)
     status = models.CharField(max_length=30, null=False, blank=False, choices=STATUS)
-
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.title
