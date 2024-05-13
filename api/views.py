@@ -6,13 +6,49 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.request import Request
 from django.http import HttpRequest, JsonResponse
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 
-@api_view(http_method_names=["POST"])
-class FileUploaderViewSet(viewsets.ModelViewSet):
-    queryset = FileUploaded.objects.all()
-    serializer_class = FileUploadedSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ["status"]
-    ordering = ["created_at"]
+@api_view(["GET"])
+def apiOverview(request):
+    api_urls = {
+        "List": "/file-list/",
+        "Detail View": "/file-detail/<str:pk>/",
+        "Create": "/file-create/",
+        "Update": "/file-update/<str:pk>/",
+        "Delete": "/file-delete/<str:pk>/",
+    }
+
+    return Response(api_urls)
+
+
+@api_view(["GET"])
+def fileList(_request: Request):
+    files = FileUploaded.objects.all()
+    serializer = FileUploadedSerializer(files, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def fileDetail(_request, pk):
+    file = FileUploaded.objects.get(id=pk)
+    serializer = FileUploadedSerializer(file, many=False)
+    response = serializer.data
+    response["Access-Control-Allow-Origin"] = (
+        "*"  # Permitir solicitações de todas as origens (não recomendado para produção)
+    )
+    response["Access-Control-Allow-Methods"] = (
+        "GET, POST, PUT, DELETE, OPTIONS"  # Métodos HTTP permitidos
+    )
+    response["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    return Response(response)
+
+
+@api_view(["POST"])
+def fileCreate(request: Request):
+    serializer = FileUploadedSerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+
+    return Response(serializer.data)
