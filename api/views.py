@@ -34,13 +34,6 @@ def fileDetail(_request, pk):
     file = FileUploaded.objects.get(id=pk)
     serializer = FileUploadedSerializer(file, many=False)
     response = serializer.data
-    response["Access-Control-Allow-Origin"] = (
-        "*"  # Permitir solicitações de todas as origens (não recomendado para produção)
-    )
-    response["Access-Control-Allow-Methods"] = (
-        "GET, POST, PUT, DELETE, OPTIONS"  # Métodos HTTP permitidos
-    )
-    response["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     return Response(response)
 
 
