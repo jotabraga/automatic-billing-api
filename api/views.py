@@ -7,6 +7,8 @@ from rest_framework.request import Request
 from django.http import HttpRequest, JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+import csv
+from .tasks import my_task
 
 
 @api_view(["GET"])
@@ -18,8 +20,9 @@ def apiOverview(request):
         "Update": "/file-update/<str:pk>/",
         "Delete": "/file-delete/<str:pk>/",
     }
+    result = my_task(2, 3)
 
-    return Response(api_urls)
+    return Response({result})
 
 
 @api_view(["GET"])
