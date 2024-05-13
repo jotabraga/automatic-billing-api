@@ -6,3 +6,7 @@ class FileUploadedSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileUploaded
         fields = ["name", "status", "created_at"]
+
+
+class CSVFileSerializer(serializers.Serializer):
+    file = serializers.FileField()

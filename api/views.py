@@ -1,5 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from api.serializers import FileUploadedSerializer
+from api.serializers import FileUploadedSerializer, CSVFileSerializer
 from rest_framework import viewsets, permissions
 from api.models import FileUploaded
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -41,12 +41,16 @@ def fileDetail(_request, pk):
 
 
 @api_view(["POST"])
-def fileCreate(request: Request):
-    file = request.FILES["file"]
-
-    serializer = FileUploadedSerializer(data=request.data)
-
+def fileProcessing(request: Request):
+    serializer = CSVFileSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
+        file = serializer.validated_data["file"]
+        return Response(serializer.data)
 
-    return Response(serializer.data)
+
+def saveFileUploadRecord(filename, status):
+    fileUploadserializer = FileUploadedSerializer(
+        {"name": filename, "status": "success"}
+    )
+    if fileUploadserializer.is_valid():
+        fileUploadserializer.save()
