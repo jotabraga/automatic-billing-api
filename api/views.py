@@ -1,13 +1,11 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from api.serializers import FileUploadedSerializer, CSVFileSerializer
-from rest_framework import viewsets, permissions
 from api.models import FileUploaded
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.request import Request
 from django.http import HttpRequest, JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-import csv
 from .tasks import my_task
 
 
@@ -16,7 +14,7 @@ def apiOverview(request):
     api_urls = {
         "List": "/file-list/",
         "Detail View": "/file-detail/<str:pk>/",
-        "Create": "/file-create/",
+        "Create": "/file-upload/",
         "Update": "/file-update/<str:pk>/",
         "Delete": "/file-delete/<str:pk>/",
     }
@@ -41,7 +39,7 @@ def fileDetail(_request, pk):
 
 
 @api_view(["POST"])
-def fileProcessing(request: Request):
+def fileProcessing(request: Request, format=None):
     serializer = CSVFileSerializer(data=request.data)
     if serializer.is_valid():
         file = serializer.validated_data["file"]
