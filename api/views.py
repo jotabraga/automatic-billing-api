@@ -42,6 +42,8 @@ def fileDetail(_request, pk):
 
 @api_view(["POST"])
 def fileCreate(request: Request):
+    file = request.FILES["file"]
+
     serializer = FileUploadedSerializer(data=request.data)
 
     if serializer.is_valid():
