@@ -24,7 +24,7 @@ def apiOverview(request):
 
 @api_view(["GET"])
 def fileList(_request: Request):
-    files = FileUploaded.objects.all()
+    files = FileUploaded.objects.all().order_by("-created_at")
     serializer = FileUploadedSerializer(files, many=True)
     return Response(serializer.data)
 
