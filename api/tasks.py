@@ -8,10 +8,8 @@ import datetime
 def process_large_csv(file):
     chunks = divide_file_into_chunks(file)
     results = [process_csv_chunk.delay(chunk) for chunk in chunks]
-    results = [result.get() for result in results]
-    final_result = combine_results(results)
-
-    return final_result
+    # results = [result.get() for result in results]
+    # final_result = combine_results(results)
 
 
 @shared_task

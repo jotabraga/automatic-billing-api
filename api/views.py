@@ -39,16 +39,35 @@ def fileDetail(_request, pk):
 
 @api_view(["POST"])
 def fileProcessing(request: Request, format=None):
-    serializer = CSVFileSerializer(data=request.data)
-    if serializer.is_valid():
-        file = serializer.validated_data["file"]
-        process_large_csv(file)
-        return Response(
-            {"message": "File processing started"}, status=status.HTTP_200_OK
-        )
+    csv_file = request.FILES["file"]
+    file_name = csv_file.name
+
+    process_large_csv(csv_file)
+
+    # serializer = CSVFileSerializer(data=request.data)
+    # if serializer.is_valid():
+    #     file = serializer.validated_data["file"]
+
+    # else:
+    #     saveFileUploadRecord(file.name, "fail")
+
+    saveFileRecord = saveFileUploadRecord(file_name, "success")
+
+    return Response(
+        {
+            "name": csv_file.name,
+            "status": "success",
+            "created_at": saveFileRecord["created_at"],
+        },
+        status=status.HTTP_200_OK,
+    )
 
 
 def saveFileUploadRecord(filename, status):
-    fileUploadserializer = FileUploadedSerializer({"name": filename, "status": status})
+
+    fileUploadserializer = FileUploadedSerializer(
+        data={"name": filename, "status": status}
+    )
     if fileUploadserializer.is_valid():
         fileUploadserializer.save()
+        return fileUploadserializer.data
