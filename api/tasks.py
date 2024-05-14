@@ -14,6 +14,7 @@ def process_large_csv(file):
     return final_result
 
 
+@shared_task
 def process_csv_chunk(chunk):
     for row in chunk:
         generate_boleto(row)
@@ -39,6 +40,7 @@ def combine_results(results):
 
 
 def generate_boleto(row):
+    print(row)
 
     # name = row["name"]
     # government_id = row["governmentId"]
