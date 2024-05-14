@@ -6,7 +6,8 @@ from rest_framework.request import Request
 from django.http import HttpRequest, JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .tasks import my_task
+from .tasks import process_large_csv
+from rest_framework import status
 
 
 @api_view(["GET"])
@@ -18,9 +19,7 @@ def apiOverview(request):
         "Update": "/file-update/<str:pk>/",
         "Delete": "/file-delete/<str:pk>/",
     }
-    result = my_task(2, 3)
-
-    return Response({result})
+    return Response(api_urls)
 
 
 @api_view(["GET"])
@@ -43,12 +42,13 @@ def fileProcessing(request: Request, format=None):
     serializer = CSVFileSerializer(data=request.data)
     if serializer.is_valid():
         file = serializer.validated_data["file"]
-        return Response(serializer.data)
+        process_large_csv(file)
+        return Response(
+            {"message": "File processing started"}, status=status.HTTP_200_OK
+        )
 
 
 def saveFileUploadRecord(filename, status):
-    fileUploadserializer = FileUploadedSerializer(
-        {"name": filename, "status": "success"}
-    )
+    fileUploadserializer = FileUploadedSerializer({"name": filename, "status": status})
     if fileUploadserializer.is_valid():
         fileUploadserializer.save()
