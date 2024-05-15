@@ -6,7 +6,7 @@ from rest_framework.request import Request
 from django.http import HttpRequest, JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .tasks import process_large_csv
+from .tasks import process_csv_lote
 from rest_framework import status
 
 
@@ -40,19 +40,22 @@ def fileDetail(_request, pk):
 @api_view(["POST"])
 def fileProcessing(request: Request, format=None):
     csv_file = request.FILES["file"]
+
+    if not csv_file:
+        return Response(
+            {"error": "File not provided"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    lote_size = 10000
+    lines = csv_file.readlines()
+    # first line doesnt have customer info
+    for i in range(1, len(lines), lote_size):
+        lote = lines[i : i + lote_size]
+        # send to celery to parallel processing
+        process_csv_lote.delay(lote)
+
     file_name = csv_file.name
-
-    process_large_csv(csv_file)
-
-    # serializer = CSVFileSerializer(data=request.data)
-    # if serializer.is_valid():
-    #     file = serializer.validated_data["file"]
-
-    # else:
-    #     saveFileUploadRecord(file.name, "fail")
-
     saveFileRecord = saveFileUploadRecord(file_name, "success")
-
     return Response(
         {
             "name": csv_file.name,
@@ -64,7 +67,6 @@ def fileProcessing(request: Request, format=None):
 
 
 def saveFileUploadRecord(filename, status):
-
     fileUploadserializer = FileUploadedSerializer(
         data={"name": filename, "status": status}
     )

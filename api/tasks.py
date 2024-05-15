@@ -5,17 +5,9 @@ import datetime
 
 
 @shared_task
-def process_large_csv(file):
-    chunks = divide_file_into_chunks(file)
-    results = [process_csv_chunk.delay(chunk) for chunk in chunks]
-    # results = [result.get() for result in results]
-    # final_result = combine_results(results)
-
-
-@shared_task
-def process_csv_chunk(chunk):
-    for row in chunk:
-        generate_boleto(row)
+def process_csv_lote(lote):
+    for line in lote:
+        boleto = generate_boleto(line.decode("utf-8"))
 
 
 def divide_file_into_chunks(file, chunk_size=10000):  # Chunk size de 1MB
