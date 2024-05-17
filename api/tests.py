@@ -36,3 +36,19 @@ class TestApiOverview(APITestCase):
         response = self.client.get(reverse("api:api-overview"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, self.api_urls)
+
+
+class TestApiOverview(APITestCase):
+    def setUp(self):
+        self.api_urls = {
+            "List": "/file-list/",
+            "Detail View": "/file-detail/<str:pk>/",
+            "Create": "/file-upload/",
+            "Update": "/file-update/<str:pk>/",
+            "Delete": "/file-delete/<str:pk>/",
+        }
+
+    def test_api_overview(self):
+        response = self.client.get(reverse("api:api-overview"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, self.api_urls)
