@@ -5,7 +5,6 @@ from datetime import date
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from celery.utils.log import get_task_logger
-import os
 
 logger = get_task_logger(__name__)
 
