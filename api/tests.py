@@ -39,10 +39,10 @@ class TestApiOverview(APITestCase):
 
 
 class TestApiGetFileRecords(APITestCase):
-    def setUp(self):
-        files = [{}]
 
-    def test_api_overview(self):
-        response = self.client.get(reverse("api:api-overview"))
+    def test_api_file_list(self):
+
+        file = FileUploaded.objects.create(name="File", status="success")
+        response = self.client.get(reverse("api:file-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, self.api_urls)
+        self.assertEqual(response.data, file)
